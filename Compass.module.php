@@ -7,7 +7,7 @@
  * rage clicks and mouse movement per page.
  *
  * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
- * @version 1.0.0
+ * @version 1.1.0
  * @license MIT
  */
 class Compass extends WireData implements Module, ConfigurableModule {
@@ -16,7 +16,7 @@ class Compass extends WireData implements Module, ConfigurableModule {
 		return [
 			'title'    => 'Compass',
 			'summary'  => 'Heatmap analytics: clicks, scroll depth, rage clicks and mouse movement.',
-			'version'  => 100,
+			'version'  => 110,
 			'author'   => 'Maxim Semenov',
 			'href'     => 'https://smnv.org',
 			'singular' => true,
@@ -81,6 +81,10 @@ class Compass extends WireData implements Module, ConfigurableModule {
 		// Remove X-Frame-Options for superusers (needed for iframe viewer)
 		$this->addHookAfter('ProcessPageView::execute', $this, 'hookAllowIframe');
 
+		// Add an optional tab to Native Analytics when its hookable dashboard is installed
+		$this->addHookAfter('ProcessNativeAnalytics::getTabLabels', $this, 'hookNativeAnalyticsTabLabels');
+		$this->addHookAfter('ProcessNativeAnalytics::getTabs', $this, 'hookNativeAnalyticsTabs');
+
 		// Prune old events once per day
 		$this->addHook('LazyCron::everyDay', $this, 'pruneOldEvents');
 	}
@@ -104,7 +108,7 @@ class Compass extends WireData implements Module, ConfigurableModule {
 
 		// Skip excluded roles
 		$user = $this->wire->user;
-		$excludedRoles = $this->parseConfigList($this->get('exclude_roles')) ?: ['superuser'];
+		$excludedRoles = $this->parseConfigList($this->get('exclude_roles'));
 		foreach($excludedRoles as $role) {
 			if($user->hasRole($role)) return;
 		}
@@ -160,6 +164,31 @@ HTML;
 			header_remove('X-Frame-Options');
 		}
 		header('X-Frame-Options: SAMEORIGIN');
+	}
+
+	// -------------------------------------------------------------------------
+	// Hooks: optional Native Analytics dashboard tab
+	// -------------------------------------------------------------------------
+
+	public function hookNativeAnalyticsTabLabels(HookEvent $event): void {
+		if(!$this->wire->user->isSuperuser()) return;
+		if(!is_array($event->return)) return;
+
+		$labels = $event->return;
+		$labels['compass'] = 'Compass';
+		$event->return = $labels;
+	}
+
+	public function hookNativeAnalyticsTabs(HookEvent $event): void {
+		if(!$this->wire->user->isSuperuser()) return;
+		if(!is_array($event->return)) return;
+
+		$process = $this->wire->modules->get('ProcessCompass');
+		if(!$process || !method_exists($process, 'renderViewer')) return;
+
+		$tabs = $event->return;
+		$tabs['compass'] = $process->renderViewer();
+		$event->return = $tabs;
 	}
 
 	// -------------------------------------------------------------------------
@@ -365,7 +394,7 @@ HTML;
 		$f->attr('name', 'exclude_roles');
 		$f->label = __('Exclude roles (comma-separated)');
 		$f->attr('value', implode(', ', (array) $data['exclude_roles']));
-		$f->notes = __('Users with these roles will not be tracked. Default: superuser');
+		$f->notes = __('Users with these roles will not be tracked. Default: superuser. Leave blank to track all roles.');
 		$fs2->add($f);
 
 		/** @var InputfieldText $f */

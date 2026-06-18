@@ -2,6 +2,20 @@
 
 All notable changes to Compass will be documented in this file.
 
+## 1.1.0 - 2026-06-18
+
+### Added
+
+- Added optional Native Analytics dashboard integration: Compass now adds a tab when Native Analytics exposes hookable dashboard tabs.
+- Kept Compass fully standalone when Native Analytics is not installed or does not expose the dashboard tab hooks.
+
+## 1.0.1 - 2026-06-18
+
+### Fixed
+
+- Respect an intentionally empty `exclude_roles` setting instead of forcing `superuser` to remain excluded.
+- Clarified the exclude roles setting note: leave it blank to track all roles.
+
 ## 1.0.0 - 2026-06-17
 
 Initial public release.

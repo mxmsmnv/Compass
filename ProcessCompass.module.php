@@ -7,7 +7,7 @@
  * Two-panel layout: page list (sidebar) + iframe with canvas overlay (main).
  *
  * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
- * @version 1.0.0
+ * @version 1.1.0
  */
 class ProcessCompass extends Process implements Module {
 
@@ -15,7 +15,7 @@ class ProcessCompass extends Process implements Module {
 		return [
 			'title'    => 'Compass',
 			'summary'  => 'Heatmap viewer — clicks, scroll depth, rage clicks, mouse movement.',
-			'version'  => 100,
+			'version'  => 110,
 			'author'   => 'Maxim Semenov',
 			'href'     => 'https://smnv.org',
 			'icon'     => 'crosshairs',
@@ -39,6 +39,10 @@ class ProcessCompass extends Process implements Module {
 	// -----------------------------------------------------------------------
 
 	public function ___execute(): string {
+		return $this->renderViewer();
+	}
+
+	public function renderViewer(): string {
 		if(!$this->wire->user->isSuperuser()) {
 			throw new WirePermissionException($this->_('Access denied.'));
 		}
@@ -60,7 +64,7 @@ class ProcessCompass extends Process implements Module {
 
 		$html  = $this->renderLayout($this->getTrackedPages());
 
-		// Inline scripts at end of output — guaranteed to run after DOM is ready
+		// Inline scripts at end of output — guaranteed to run after viewer markup exists
 		// $config->scripts->add() runs in <head> before PW AJAX injects content
 		$html .= <<<HTML
 <script>window.__compassViewer = {$cfg};</script>

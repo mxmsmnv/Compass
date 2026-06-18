@@ -433,8 +433,7 @@
 		initResizeObserver();
 	}
 
-	// Scripts are inlined after HTML in ProcessCompass::___execute()
-	// so DOM is always ready — no need to wait
+	// Scripts are inlined after the viewer markup, so no DOM-ready wait is needed.
 	boot();
 
 })();

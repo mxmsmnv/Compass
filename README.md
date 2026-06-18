@@ -16,6 +16,7 @@ Heatmap analytics for ProcessWire. Tracks where visitors click, how far they scr
 - **Device stats** — see traffic split in the admin viewer
 - **Export PNG** — save the heatmap layer as an image
 - **Dark mode** — uses `--pw-*` CSS variables, works with AdminThemeUikit automatically
+- **Native Analytics integration** — adds an optional Compass tab when Native Analytics supports hookable dashboard tabs
 - **Zero external requests** — all data stays on your server
 
 ---
@@ -64,6 +65,8 @@ Events are stored in a single MySQL table `compass_events`.
 ### Viewing
 
 Go to **Setup → Compass** in the admin. Select any page from the left sidebar — its URL loads in an iframe on the right, with the heatmap rendered as a canvas overlay. Switch between event types and date ranges using the toolbar.
+
+If Native Analytics is installed and exposes hookable dashboard tabs, Compass also appears as a tab inside its dashboard. This integration is optional; Compass remains fully usable from **Setup → Compass** without Native Analytics.
 
 ---
 

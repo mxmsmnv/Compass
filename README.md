@@ -2,6 +2,8 @@
 
 Heatmap analytics for ProcessWire. Tracks where visitors click, how far they scroll, rage clicks, and mouse movement — visualised as an interactive heatmap directly in the admin.
 
+![Compass](assets/Compass.png)
+
 ---
 
 ## Features

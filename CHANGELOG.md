@@ -2,6 +2,16 @@
 
 All notable changes to Compass will be documented in this file.
 
+## 1.2.0 - 2026-07-30
+
+### Fixed
+
+- Tracker collection no longer creates or persists a ProcessWire session.
+  Rate limiting now uses server-side WireCache, while the response retains only
+  Compass's opaque `compass_sid` cookie. This keeps subsequent anonymous page
+  views eligible for CloudCache.
+- Tracker responses are explicitly private and non-cacheable.
+
 ## 1.1.0 - 2026-06-18
 
 ### Added

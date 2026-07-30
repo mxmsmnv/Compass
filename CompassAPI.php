@@ -15,6 +15,7 @@
 class CompassAPI extends Wire {
 
 	protected Compass $module;
+	protected ?string $newTrackerSessionId = null;
 
 	public function __construct(Compass $module) {
 		parent::__construct();
@@ -46,6 +47,9 @@ class CompassAPI extends Wire {
 		}
 
 		ob_end_clean();
+		if($endpoint === Compass::ENDPOINT_TRACK) {
+			$this->finalizeTrackerCookies();
+		}
 		return $response;
 	}
 
@@ -55,7 +59,8 @@ class CompassAPI extends Wire {
 
 	protected function handleTrack(): string {
 		header('Content-Type: application/json');
-
+		header('Cache-Control: private, no-store, max-age=0');
+		header('Pragma: no-cache');
 		if($_SERVER['REQUEST_METHOD'] !== 'POST') {
 			return $this->jsonError(405, 'Method not allowed');
 		}
@@ -347,37 +352,45 @@ class CompassAPI extends Wire {
 		}
 
 		$sid = bin2hex(random_bytes(16));
-		setcookie($key, $sid, [
-			'expires'  => time() + 86400 * 365,
-			'path'     => '/',
-			'httponly' => true,
-			'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-			'samesite' => 'Lax',
-		]);
+		$this->newTrackerSessionId = $sid;
 
 		return $sid;
 	}
 
 	protected function checkRateLimit(string $sessionId, int $eventCount): bool {
-		if(session_status() === PHP_SESSION_NONE) {
-			if(!session_start()) {
-				$this->wire->log->warning('Compass: session unavailable, rate limiting skipped.');
-				return true;
-			}
-		}
-
-		$key  = 'compass_rl_' . $sessionId;
+		$key  = 'Compass.rate.' . hash('sha256', $sessionId);
 		$now  = time();
-		$data = $_SESSION[$key] ?? ['count' => 0, 'start' => $now];
+		$data = $this->wire->cache->get($key);
+		if(!is_array($data)) {
+			$data = ['count' => 0, 'start' => $now];
+		}
 
 		if(($now - $data['start']) > Compass::RATE_LIMIT_WINDOW) {
 			$data = ['count' => 0, 'start' => $now];
 		}
 
 		$data['count'] += max(1, $eventCount);
-		$_SESSION[$key] = $data;
+		$this->wire->cache->save($key, $data, Compass::RATE_LIMIT_WINDOW);
 
 		return $data['count'] <= Compass::RATE_LIMIT_MAX;
+	}
+
+	/**
+	 * Discard ProcessWire's response session cookie and retain only Compass's
+	 * opaque tracker identifier. The collection endpoint does not need a PHP
+	 * session and must not make later page views bypass a session-aware cache.
+	 */
+	protected function finalizeTrackerCookies(): void {
+		header_remove('Set-Cookie');
+		if($this->newTrackerSessionId === null) return;
+
+		setcookie('compass_sid', $this->newTrackerSessionId, [
+			'expires'  => time() + 86400 * 365,
+			'path'     => '/',
+			'httponly' => true,
+			'secure'   => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+			'samesite' => 'Lax',
+		]);
 	}
 
 	protected function jsonError(int $code, string $message): string {

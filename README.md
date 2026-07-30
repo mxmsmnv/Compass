@@ -98,7 +98,7 @@ Compass does **not** collect:
 - User agents
 - Personal identifiers
 
-Each visitor is assigned an anonymous session cookie (`compass_sid`) — a random 32-character hex string with no link to user identity. The cookie is `HttpOnly`, `SameSite=Lax`, and `Secure` when the site runs over HTTPS. It expires after 1 year.
+Each visitor is assigned an anonymous session cookie (`compass_sid`) — a random 32-character hex string with no link to user identity. The cookie is `HttpOnly`, `SameSite=Lax`, and `Secure` when the site runs over HTTPS. It expires after 1 year. The collection endpoint does not persist a ProcessWire session cookie, so it remains compatible with session-aware full-page caches such as CloudCache.
 
 Depending on your jurisdiction you may still need to disclose heatmap tracking in your privacy policy.
 

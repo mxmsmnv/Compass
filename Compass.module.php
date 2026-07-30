@@ -7,7 +7,7 @@
  * rage clicks and mouse movement per page.
  *
  * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
- * @version 1.1.0
+ * @version 1.2.0
  * @license MIT
  */
 class Compass extends WireData implements Module, ConfigurableModule {
@@ -16,7 +16,7 @@ class Compass extends WireData implements Module, ConfigurableModule {
 		return [
 			'title'    => 'Compass',
 			'summary'  => 'Heatmap analytics: clicks, scroll depth, rage clicks and mouse movement.',
-			'version'  => 110,
+			'version'  => 120,
 			'author'   => 'Maxim Semenov',
 			'href'     => 'https://smnv.org',
 			'singular' => true,

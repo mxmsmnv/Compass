@@ -7,7 +7,7 @@
  * rage clicks and mouse movement per page.
  *
  * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
- * @version 1.2.0
+ * @version 1.2.1
  * @license MIT
  */
 class Compass extends WireData implements Module, ConfigurableModule {
@@ -16,13 +16,13 @@ class Compass extends WireData implements Module, ConfigurableModule {
 		return [
 			'title'    => 'Compass',
 			'summary'  => 'Heatmap analytics: clicks, scroll depth, rage clicks and mouse movement.',
-			'version'  => 120,
+			'version'  => 121,
 			'author'   => 'Maxim Semenov',
 			'href'     => 'https://smnv.org',
 			'singular' => true,
 			'autoload' => true,
 			'icon'     => 'crosshairs',
-			'requires' => ['ProcessWire>=3.0.0', 'PHP>=8.0.0', 'LazyCron'],
+			'requires' => ['ProcessWire>=3.0.274', 'PHP>=8.0.0', 'LazyCron'],
 			'installs' => ['ProcessCompass'],
 		];
 	}
@@ -328,25 +328,11 @@ HTML;
 	}
 
 	protected function columnExists(string $table, string $column): bool {
-		$stmt = $this->wire->database->prepare("
-			SELECT COUNT(*) FROM information_schema.COLUMNS
-			WHERE TABLE_SCHEMA = DATABASE()
-			  AND TABLE_NAME   = :table
-			  AND COLUMN_NAME  = :column
-		");
-		$stmt->execute([':table' => $table, ':column' => $column]);
-		return (bool) $stmt->fetchColumn();
+		return $this->wire->database->columnExists($table, $column);
 	}
 
 	protected function indexExists(string $table, string $index): bool {
-		$stmt = $this->wire->database->prepare("
-			SELECT COUNT(*) FROM information_schema.STATISTICS
-			WHERE TABLE_SCHEMA = DATABASE()
-			  AND TABLE_NAME   = :table
-			  AND INDEX_NAME   = :index
-		");
-		$stmt->execute([':table' => $table, ':index' => $index]);
-		return (bool) $stmt->fetchColumn();
+		return $this->wire->database->indexExists($table, $index);
 	}
 
 	// -------------------------------------------------------------------------

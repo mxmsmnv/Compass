@@ -2,6 +2,14 @@
 
 All notable changes to Compass will be documented in this file.
 
+## 1.2.1 - 2026-09-26
+
+### Fixed
+
+- Use ProcessWire's portable column and index introspection APIs during schema
+  upgrades, allowing the same upgrade path on MySQL/MariaDB, SQLite, and
+  PostgreSQL.
+
 ## 1.2.0 - 2026-07-30
 
 ### Fixed

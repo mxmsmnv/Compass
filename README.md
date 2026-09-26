@@ -25,8 +25,9 @@ Heatmap analytics for ProcessWire. Tracks where visitors click, how far they scr
 
 ## Requirements
 
-- ProcessWire 3.0.0+
+- ProcessWire 3.0.274+
 - PHP 8.0+
+- MySQL/MariaDB, SQLite, or PostgreSQL
 
 ---
 
@@ -62,7 +63,8 @@ Compass/
 
 Once installed, Compass automatically injects a small tracker script (`tracker.js`, ~3kb minified) into every frontend page. The script collects events and sends them in batches to the site-root `compass-track` endpoint using `navigator.sendBeacon` (with `fetch` as fallback). No page load performance impact.
 
-Events are stored in a single MySQL table `compass_events`.
+Events are stored in the `compass_events` table through ProcessWire's configured
+MySQL/MariaDB, SQLite, or PostgreSQL driver.
 
 ### Viewing
 

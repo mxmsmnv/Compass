@@ -2,6 +2,13 @@
 
 All notable changes to Compass will be documented in this file.
 
+## 1.2.2 - 2026-09-26
+
+### Fixed
+
+- Replaced boolean `SUM()` expressions in device statistics with portable
+  conditional aggregates for PostgreSQL.
+
 ## 1.2.1 - 2026-09-26
 
 ### Fixed

@@ -10,7 +10,7 @@
  * Instantiated and called by Compass::hookHandleEndpoints().
  *
  * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
- * @version 1.0.0
+ * @version 1.2.2
  */
 class CompassAPI extends Wire {
 
@@ -275,9 +275,9 @@ class CompassAPI extends Wire {
 				COUNT(DISTINCT session_id) as sessions,
 				MIN(created_at)            as first_seen,
 				MAX(created_at)            as last_seen,
-				SUM(device_type = 'desktop') as desktop_cnt,
-				SUM(device_type = 'mobile')  as mobile_cnt,
-				SUM(device_type = 'tablet')  as tablet_cnt
+				SUM(CASE WHEN device_type = 'desktop' THEN 1 ELSE 0 END) as desktop_cnt,
+				SUM(CASE WHEN device_type = 'mobile' THEN 1 ELSE 0 END)  as mobile_cnt,
+				SUM(CASE WHEN device_type = 'tablet' THEN 1 ELSE 0 END)  as tablet_cnt
 			FROM " . Compass::TABLE . "
 			WHERE page_id = :page_id AND created_at >= :since
 			{$deviceSql}

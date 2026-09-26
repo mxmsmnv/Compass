@@ -3,12 +3,15 @@
 $root = dirname(__DIR__);
 $module = (string)file_get_contents($root . '/Compass.module.php');
 $process = (string)file_get_contents($root . '/ProcessCompass.module.php');
+$api = (string)file_get_contents($root . '/CompassAPI.php');
 
 $checks = [
 	'upgrade avoids MySQL information_schema' => !str_contains($module, 'information_schema'),
 	'upgrade uses ProcessWire column introspection' => str_contains($module, 'database->columnExists($table, $column)'),
 	'upgrade uses ProcessWire index introspection' => str_contains($module, 'database->indexExists($table, $index)'),
-	'release versions are synchronized' => substr_count($module . $process, "'version'  => 121") === 2,
+	'release versions are synchronized' => substr_count($module . $process, "'version'  => 122") === 2,
+	'device statistics use conditional aggregates' => substr_count($api, 'SUM(CASE WHEN device_type =') === 3
+		&& !str_contains($api, 'SUM(device_type ='),
 ];
 
 $failed = [];

@@ -7,7 +7,7 @@
  * Two-panel layout: page list (sidebar) + iframe with canvas overlay (main).
  *
  * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
- * @version 1.2.2
+ * @version 1.2.3
  */
 class ProcessCompass extends Process implements Module {
 
@@ -15,7 +15,7 @@ class ProcessCompass extends Process implements Module {
 		return [
 			'title'    => 'Compass',
 			'summary'  => 'Heatmap viewer — clicks, scroll depth, rage clicks, mouse movement.',
-			'version'  => 122,
+			'version'  => 123,
 			'author'   => 'Maxim Semenov',
 			'href'     => 'https://smnv.org',
 			'icon'     => 'crosshairs',

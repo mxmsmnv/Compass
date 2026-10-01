@@ -2,6 +2,13 @@
 
 All notable changes to Compass will be documented in this file.
 
+## 1.2.3 - 2026-09-30
+
+### Fixed
+
+- Corrected the minimum ProcessWire version to 3.0.182, where the schema
+  introspection APIs used by Compass were introduced.
+
 ## 1.2.2 - 2026-09-26
 
 ### Fixed

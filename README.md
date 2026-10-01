@@ -25,7 +25,7 @@ Heatmap analytics for ProcessWire. Tracks where visitors click, how far they scr
 
 ## Requirements
 
-- ProcessWire 3.0.274+
+- ProcessWire 3.0.182+
 - PHP 8.0+
 - MySQL/MariaDB, SQLite, or PostgreSQL
 

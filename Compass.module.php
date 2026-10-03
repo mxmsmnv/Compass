@@ -118,11 +118,15 @@ class Compass extends WireData implements Module, ConfigurableModule {
 
 		$trackerUrl = $this->wire->config->urls->siteModules . 'Compass/js/tracker.js';
 
+		// get possible nonce value
+		$nonceVal = $this -> getNonce();
+		$nonce = $nonceVal ? ' nonce="'.$nonceVal.'"' : null;
+		
 		$script = <<<HTML
-<script>
+<script{$nonce}>
 window.__compass = {$configJson};
 </script>
-<script src="{$trackerUrl}" defer></script>
+<script src="{$trackerUrl}" defer{$nonce}></script>
 HTML;
 
 		$event->return = str_replace('</body>', $script . '</body>', $event->return);
@@ -217,6 +221,13 @@ HTML;
 		if(is_array($value)) return array_filter(array_map('trim', $value));
 		if(!is_string($value) || $value === '') return [];
 		return array_filter(array_map('trim', explode(',', $value)));
+	}
+
+	/**
+	* Parses the list of sent headers if a CSP nonce is present for script-src or script-src-elem
+	*/
+	private function getNonce(): ?string {
+		return preg_match("/(?:^|;)\s*script-src(?:-elem)?\s+[^;]*'nonce-([^']+)'/i", implode(';', headers_list()), $m) ? $m[1] : null;
 	}
 
 	// -------------------------------------------------------------------------

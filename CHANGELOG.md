@@ -2,6 +2,14 @@
 
 All notable changes to Compass will be documented in this file.
 
+## 1.2.4 - 2026-10-08
+
+### Fixed
+
+- Reused a shared nonce from enforced Content Security Policy headers on both
+  injected tracker script elements. Report-only policies and conflicting
+  multiple policies do not grant a nonce.
+
 ## 1.2.3 - 2026-09-30
 
 ### Fixed

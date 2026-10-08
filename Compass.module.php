@@ -7,7 +7,7 @@
  * rage clicks and mouse movement per page.
  *
  * @author Maxim Semenov <maxim@smnv.org> (smnv.org)
- * @version 1.2.3
+ * @version 1.2.4
  * @license MIT
  */
 class Compass extends WireData implements Module, ConfigurableModule {
@@ -16,7 +16,7 @@ class Compass extends WireData implements Module, ConfigurableModule {
 		return [
 			'title'    => 'Compass',
 			'summary'  => 'Heatmap analytics: clicks, scroll depth, rage clicks and mouse movement.',
-			'version'  => 123,
+			'version'  => 124,
 			'author'   => 'Maxim Semenov',
 			'href'     => 'https://smnv.org',
 			'singular' => true,
@@ -118,10 +118,11 @@ class Compass extends WireData implements Module, ConfigurableModule {
 
 		$trackerUrl = $this->wire->config->urls->siteModules . 'Compass/js/tracker.js';
 
-		// get possible nonce value
-		$nonceVal = $this -> getNonce();
-		$nonce = $nonceVal ? ' nonce="'.$nonceVal.'"' : null;
-		
+		$nonceValue = $this->getNonce();
+		$nonce = $nonceValue !== ''
+			? ' nonce="' . htmlspecialchars($nonceValue, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"'
+			: '';
+
 		$script = <<<HTML
 <script{$nonce}>
 window.__compass = {$configJson};
@@ -223,11 +224,40 @@ HTML;
 		return array_filter(array_map('trim', explode(',', $value)));
 	}
 
+	/** Return a nonce accepted by every enforced CSP policy, or an empty string. */
+	private function getNonce(): string {
+		return self::cspNonceFromHeaders(headers_list());
+	}
+
 	/**
-	* Parses the list of sent headers if a CSP nonce is present for script-src or script-src-elem
-	*/
-	private function getNonce(): ?string {
-		return preg_match("/(?:^|;)\s*script-src(?:-elem)?\s+[^;]*'nonce-([^']+)'/i", implode(';', headers_list()), $m) ? $m[1] : null;
+	 * Resolve script-src-elem, script-src, then default-src for each policy.
+	 * Multiple enforced CSP headers are cumulative, so the nonce must be shared
+	 * by every policy. Report-only headers never grant execution permission.
+	 */
+	protected static function cspNonceFromHeaders(array $headers): string {
+		$common = null;
+		foreach($headers as $header) {
+			if(!preg_match('/^Content-Security-Policy\s*:\s*(.+)$/i', trim((string)$header), $match)) continue;
+			$directives = [];
+			foreach(explode(';', $match[1]) as $rawDirective) {
+				$tokens = preg_split('/\s+/', trim($rawDirective), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+				if(!$tokens) continue;
+				$name = strtolower((string)array_shift($tokens));
+				$directives[$name] = $tokens;
+			}
+
+			$sources = $directives['script-src-elem'] ?? $directives['script-src'] ?? $directives['default-src'] ?? [];
+			$nonces = [];
+			foreach($sources as $source) {
+				if(preg_match("/^'nonce-([A-Za-z0-9+\/_-]+={0,2})'$/i", (string)$source, $nonceMatch)) {
+					$nonces[$nonceMatch[1]] = true;
+				}
+			}
+			if(!$nonces) return '';
+			$common = $common === null ? $nonces : array_intersect_key($common, $nonces);
+			if(!$common) return '';
+		}
+		return $common ? (string)array_key_first($common) : '';
 	}
 
 	// -------------------------------------------------------------------------

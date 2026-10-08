@@ -9,7 +9,7 @@ $checks = [
 	'upgrade avoids MySQL information_schema' => !str_contains($module, 'information_schema'),
 	'upgrade uses ProcessWire column introspection' => str_contains($module, 'database->columnExists($table, $column)'),
 	'upgrade uses ProcessWire index introspection' => str_contains($module, 'database->indexExists($table, $index)'),
-	'release versions are synchronized' => substr_count($module . $process, "'version'  => 123") === 2,
+	'release versions are synchronized' => substr_count($module . $process, "'version'  => 124") === 2,
 	'minimum ProcessWire version matches schema API availability' => str_contains($module, "'ProcessWire>=3.0.182'"),
 	'device statistics use conditional aggregates' => substr_count($api, 'SUM(CASE WHEN device_type =') === 3
 		&& !str_contains($api, 'SUM(device_type ='),

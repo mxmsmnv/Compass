@@ -20,6 +20,7 @@ Heatmap analytics for ProcessWire. Tracks where visitors click, how far they scr
 - **Dark mode** — uses `--pw-*` CSS variables, works with AdminThemeUikit automatically
 - **Native Analytics integration** — adds an optional Compass tab when Native Analytics supports hookable dashboard tabs
 - **Zero external requests** — all data stays on your server
+- **CSP nonce support** — injected configuration and tracker scripts reuse a nonce from the enforced `script-src-elem`, `script-src`, or `default-src` policy
 
 ---
 
